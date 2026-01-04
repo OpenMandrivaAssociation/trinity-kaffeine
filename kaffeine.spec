@@ -10,21 +10,11 @@
 %if "%{?tde_version}" == ""
 %define tde_version 14.1.5
 %endif
-%define pkg_rel 2
+%define pkg_rel 3
 
 %define tde_pkg kaffeine
 %define tde_prefix /opt/trinity
-%define tde_appdir %{tde_datadir}/applications
-%define tde_bindir %{tde_prefix}/bin
-%define tde_datadir %{tde_prefix}/share
-%define tde_docdir %{tde_datadir}/doc
-%define tde_includedir %{tde_prefix}/include
-%define tde_libdir %{tde_prefix}/%{_lib}
-%define tde_mandir %{tde_datadir}/man
-%define tde_tdeappdir %{tde_datadir}/applications/tde
-%define tde_tdedocdir %{tde_docdir}/tde
-%define tde_tdeincludedir %{tde_includedir}/tde
-%define tde_tdelibdir %{tde_libdir}/trinity
+
 
 %undefine __brp_remove_la_files
 %define dont_remove_libtool_files 1
@@ -46,27 +36,21 @@ URL:			http://kaffeine.sourceforge.net/
 
 License:	GPLv2+
 
-#Vendor:		Trinity Desktop
-#Packager:	Francois Andriot <francois.andriot@free.fr>
 
 Source0:		https://mirror.ppa.trinitydesktop.org/trinity/releases/R%{tde_version}/main/applications/multimedia/%{tarball_name}-%{tde_version}%{?preversion:~%{preversion}}.tar.xz
 Source1:		%{name}-rpmlintrc
 
 BuildSystem:    cmake
+
 BuildOption:    -DCMAKE_BUILD_TYPE="RelWithDebInfo"
-BuildOption:    -DCMAKE_SKIP_RPATH=OFF
-BuildOption:    -DCMAKE_SKIP_INSTALL_RPATH=OFF
-BuildOption:    -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON
-BuildOption:    -DCMAKE_INSTALL_RPATH="%{tde_libdir}"
 BuildOption:    -DCMAKE_INSTALL_PREFIX=%{tde_prefix}
-BuildOption:    -DINCLUDE_INSTALL_DIR=%{tde_tdeincludedir}
-BuildOption:    -DLIB_INSTALL_DIR=%{tde_libdir}
-BuildOption:    -DSHARE_INSTALL_PREFIX=%{tde_datadir}
-BuildOption:    -DWITH_ALL_OPTIONS=ON
-%{?!with_dvb:BuildOption:    -DWITH_DVB=OFF}
-%{?!with_lame:BuildOption:    -DWITH_LAME=OFF}
-%{?!with_xcb:BuildOption:    -DWITH_XCB=OFF}
-BuildOption:    -DBUILD_ALL=ON
+BuildOption:    -DINCLUDE_INSTALL_DIR=%{tde_prefix}/include/tde
+BuildOption:    -DSHARE_INSTALL_PREFIX=%{tde_prefix}/share
+BuildOption:    -DWITH_ALL_OPTIONS=ON -DBUILD_ALL=ON
+BuildOption:    -DWITH_GCC_VISIBILITY=%{!?with_clang:ON}%{?with_clang:OFF}
+BuildOption:    -DWITH_DVB=%{?!with_dvb:OFF}%{?with_dvb:ON}
+BuildOption:    -DWITH_LAME=%{?!with_lame:OFF}%{?with_lame:ON}
+BuildOption:    -DWITH_XCB=%{?!with_xcb:OFF}%{?with_xcb:ON}
 
 BuildRequires:	trinity-tdelibs-devel >= %{tde_version}
 BuildRequires:	trinity-tdebase-devel >= %{tde_version}
@@ -129,21 +113,21 @@ Konqueror plugin, OSD and much more.
 %files -f %{tde_pkg}.lang
 %defattr(-,root,root,-)
 %doc AUTHORS ChangeLog COPYING README.md TODO
-%{tde_bindir}/kaffeine
-%{tde_libdir}/libkaffeinepart.so
-%{tde_tdelibdir}/lib*.*
-%{tde_datadir}/appl*/*/*.desktop
+%{tde_prefix}/bin/kaffeine
+%{tde_prefix}/%{_lib}/libkaffeinepart.so
+%{tde_prefix}/%{_lib}/trinity/lib*.*
+%{tde_prefix}/share/appl*/*/*.desktop
 %if %{with gstreamer}
-%{tde_datadir}/apps/gstreamerpart/
+%{tde_prefix}/share/apps/gstreamerpart/
 %endif
-%{tde_datadir}/apps/kaffeine/
-%{tde_datadir}/apps/konqueror/servicemenus/*.desktop
-%{tde_datadir}/apps/profiles/
-%{tde_datadir}/icons/hicolor/*/*/*
-%{tde_datadir}/mimelnk/*/*.desktop
-%{tde_datadir}/service*/*.desktop
-%{tde_tdedocdir}/HTML/en/kaffeine/
-%{tde_mandir}/man1/kaffeine.1*
+%{tde_prefix}/share/apps/kaffeine/
+%{tde_prefix}/share/apps/konqueror/servicemenus/*.desktop
+%{tde_prefix}/share/apps/profiles/
+%{tde_prefix}/share/icons/hicolor/*/*/*
+%{tde_prefix}/share/mimelnk/*/*.desktop
+%{tde_prefix}/share/service*/*.desktop
+%{tde_prefix}/share/doc/tde/HTML/en/kaffeine/
+%{tde_prefix}/share/man/man1/kaffeine.1*
 
 ##########
 
@@ -158,9 +142,9 @@ Requires:		trinity-tdelibs-devel
 
 %files devel
 %defattr(-,root,root,-)
-%{tde_tdeincludedir}/kaffeine/
-%{tde_libdir}/lib*.so
-%exclude %{tde_libdir}/libkaffeinepart.so
+%{tde_prefix}/include/tde/kaffeine/
+%{tde_prefix}/%{_lib}/lib*.so
+%exclude %{tde_prefix}/%{_lib}/libkaffeinepart.so
 
 ##########
 
@@ -176,11 +160,11 @@ Requires:		%{name} = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %files libs
 %defattr(-,root,root,-)
-%{tde_libdir}/lib*.so.*
+%{tde_prefix}/%{_lib}/lib*.so.*
 
 %conf -p
 unset QTDIR QTINC QTLIB
-export PATH="%{tde_bindir}:${PATH}"
+export PATH="%{tde_prefix}/bin:${PATH}"
 
 
 %install -a
@@ -189,6 +173,6 @@ export PATH="%{tde_bindir}:${PATH}"
 %find_lang %{tde_pkg}
 
 # Unpackaged files
-rm -f %{buildroot}/%{tde_libdir}/lib*.la
-rm -f %{buildroot}/%{tde_datadir}/mimelnk/application/x-mplayer2.desktop
+rm -f %{buildroot}/%{tde_prefix}/%{_lib}/lib*.la
+rm -f %{buildroot}/%{tde_prefix}/share/mimelnk/application/x-mplayer2.desktop
 
