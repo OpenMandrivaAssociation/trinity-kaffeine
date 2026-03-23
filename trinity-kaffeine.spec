@@ -6,11 +6,9 @@
 %bcond lame 1
 
 # TDE variables
-%define tde_epoch 2
 %if "%{?tde_version}" == ""
 %define tde_version 14.1.5
 %endif
-%define pkg_rel 3
 
 %define tde_pkg kaffeine
 %define tde_prefix /opt/trinity
@@ -27,9 +25,8 @@
 
 
 Name:			trinity-%{tde_pkg}
-Epoch:			%{tde_epoch}
 Version:		0.8.8
-Release:		%{?tde_version}_%{?!preversion:%{pkg_rel}}%{?preversion:0_%{preversion}}%{?dist}
+Release:		%{?tde_version:%{tde_version}_}4
 Summary:		Xine-based media player
 Group:			Applications/Multimedia
 URL:			http://kaffeine.sourceforge.net/
@@ -37,7 +34,7 @@ URL:			http://kaffeine.sourceforge.net/
 License:	GPLv2+
 
 
-Source0:		https://mirror.ppa.trinitydesktop.org/trinity/releases/R%{tde_version}/main/applications/multimedia/%{tarball_name}-%{tde_version}%{?preversion:~%{preversion}}.tar.xz
+Source0:		https://mirror.ppa.trinitydesktop.org/trinity/releases/R%{tde_version}/main/applications/multimedia/%{tarball_name}-%{tde_version}.tar.xz
 Source1:		%{name}-rpmlintrc
 
 BuildSystem:    cmake
@@ -54,11 +51,12 @@ BuildOption:    -DWITH_XCB=%{?!with_xcb:OFF}%{?with_xcb:ON}
 
 BuildRequires:	trinity-tdelibs-devel >= %{tde_version}
 BuildRequires:	trinity-tdebase-devel >= %{tde_version}
+BuildRequires:	trinity-tde-cmake >= %{tde_version}
+BuildRequires:  tqt3-dev-tools
+
 BuildRequires:	desktop-file-utils
 
 BuildRequires:	gettext
-
-BuildRequires:	trinity-tde-cmake >= %{tde_version}
 
 %{!?with_clang:BuildRequires:	gcc-c++}
 
