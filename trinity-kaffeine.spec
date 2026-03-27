@@ -26,7 +26,7 @@
 
 Name:			trinity-%{tde_pkg}
 Version:		0.8.8
-Release:		%{?tde_version:%{tde_version}_}4
+Release:		%{?tde_version:%{tde_version}_}5
 Summary:		Xine-based media player
 Group:			Applications/Multimedia
 URL:			http://kaffeine.sourceforge.net/
@@ -52,7 +52,6 @@ BuildOption:    -DWITH_XCB=%{?!with_xcb:OFF}%{?with_xcb:ON}
 BuildRequires:	trinity-tdelibs-devel >= %{tde_version}
 BuildRequires:	trinity-tdebase-devel >= %{tde_version}
 BuildRequires:	trinity-tde-cmake >= %{tde_version}
-BuildRequires:  tqt3-dev-tools
 
 BuildRequires:	desktop-file-utils
 
